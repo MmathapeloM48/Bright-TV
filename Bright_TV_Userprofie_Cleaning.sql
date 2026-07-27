@@ -145,7 +145,9 @@ FROM userprofiles.brighttvdatasets.user_profile_dataset;
 
 ---------------Creating a clean table--------------
 
-CREATE OR REPLACE TEMP VIEW processed_user_profile AS
+CREATE OR REPLACE TABLE userprofiles.brighttvdatasets.cleaned_user_profile
+TBLPROPERTIES ('delta.columnMapping.mode' = 'name')
+AS
 SELECT
     UserID,
     Name,
