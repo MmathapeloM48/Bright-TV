@@ -2,6 +2,13 @@
  SELECT *
  from `userprofiles`.`brighttvdatasets`.`user_profile_dataset`
  limit 10;
+---------- checking duplicates------
+ SELECT COUNT(*),
+       UserID
+FROM userprofiles.brighttvdatasets.user_profile_dataset
+GROUP BY UserID
+HAVING COUNT (*) > 1;
+
 ----------Chender checks------
 SELECT DISTINCT `Gender`
 from `userprofiles`.`brighttvdatasets`.`user_profile_dataset`
@@ -9,11 +16,11 @@ from `userprofiles`.`brighttvdatasets`.`user_profile_dataset`
 
 SELECT DISTINCT
 CASE
-    when Gender = 'NULL' THEN 'Unknown'
-    WHEN Gender ='None' THEN 'Unknown'
-    WHEN Gender = '' THEN 'Unknown'
+WHEN Gender IS NULL THEN 'Unknown'
+WHEN Gender ='None' THEN 'Unknown'
+WHEN Gender = ' ' THEN 'Unknown'
 ELSE Gender
- END AS Sex
+END AS Sex
 from `userprofiles`.`brighttvdatasets`.`user_profile_dataset` 
  ;
 
@@ -28,13 +35,26 @@ from `userprofiles`.`brighttvdatasets`.`user_profile_dataset`
 
 SELECT DISTINCT
 CASE
-when Race = 'NULL' THEN 'Unknown'
+when Race IS NULL THEN 'Unknown'
 WHEN Race ='None' THEN 'Unknown'
-WHEN Race = '' THEN 'Unknown'
+WHEN Race = ' ' THEN 'Unknown'
 WHEN Race = 'other' THEN 'Unknown'
 ELSE Race
  END AS Ethnicity
 from `userprofiles`.`brighttvdatasets`.`user_profile_dataset` 
+ ;
+------ understading our race data------------
+SELECT COUNT (DISTINCT UserID) AS Subs,
+
+CASE
+when Race IS NULL THEN 'Unknown'
+WHEN Race ='None' THEN 'Unknown'
+WHEN Race = ' ' THEN 'Unknown'
+WHEN Race = 'other' THEN 'Unknown'
+ELSE Race
+ END AS Ethnicity
+from `userprofiles`.`brighttvdatasets`.`user_profile_dataset` 
+ GROUP BY Ethnicity
  ;
 
 SELECT *
@@ -51,7 +71,7 @@ SELECT MIN (Age) AS min_age,
  from `userprofiles`.`brighttvdatasets`.`user_profile_dataset`
 ;
 
-SELECT
+SELECT DISTINCT
 CASE
     when Age = 0 THEN 'Infant'
     WHEN Age BETWEEN 1 AND 12 THEN 'Kids'
@@ -76,19 +96,9 @@ SELECT DISTINCT
 CASE
 when Province = 'NULL' THEN 'Unknown'
 WHEN Province ='None' THEN 'Unknown'
-WHEN Province= '' THEN 'Unknown'
+WHEN Province= ' ' THEN 'Unknown'
 ELSE Province
  END AS Region
-from `userprofiles`.`brighttvdatasets`.`user_profile_dataset` 
- ;
----------Gender checks-----------------
- SELECT DISTINCT    
-CASE
-    when Gender = 'NULL' THEN 'Unknown'
-    WHEN Gender ='None' THEN 'Unknown'
-    WHEN Gender = '' THEN 'Unknown'
-ELSE Gender
- END AS Sex
 from `userprofiles`.`brighttvdatasets`.`user_profile_dataset` 
  ;
 --------- Social media handle and email check-------
@@ -122,13 +132,6 @@ from `userprofiles`.`brighttvdatasets`.`user_profile_dataset`
 SELECT DISTINCT `Social Media Handle`
 FROM userprofiles.brighttvdatasets.user_profile_dataset;
 
----------- checking duplicates------
-SELECT UserID,
-COUNT(*) AS duplicate_count
-FROM userprofiles.brighttvdatasets.user_profile_dataset
-GROUP BY UserID
-HAVING COUNT (*)>1;
-
 -------checking size of the data--------
 SELECT COUNT(*) AS number_of_rows,
 COUNT(DISTINCT UserID) AS number_subs
@@ -156,18 +159,18 @@ SELECT
     CASE
         WHEN Gender IN ('NULL','None','') THEN 'Unknown'
         ELSE Gender
-    END AS Gender,
+    END AS Sex,
 
     CASE
         WHEN Race IN ('NULL','None','','other') THEN 'Unknown'
         ELSE Race
-    END AS Race,
+    END AS Ethnicity,
 
     CASE
         WHEN Province IN ('NULL','None','') THEN 'Unknown'
         ELSE Province
-    END AS Province,
-
+    END AS Region,
+Age,
     CASE
         WHEN Age = 0 THEN 'Infant'
         WHEN Age BETWEEN 1 AND 12 THEN 'Kids'
@@ -178,8 +181,6 @@ SELECT
         ELSE 'Pensioner'
     END AS Age_Group,
 
-    Email,
-
     CASE
         WHEN Email IS NOT NULL
          AND TRIM(Email) != ''
@@ -187,8 +188,6 @@ SELECT
         THEN 1
         ELSE 0
     END AS Email_Flag,
-
-    `Social Media Handle`,
 
     CASE
         WHEN `Social Media Handle` IS NOT NULL
@@ -199,3 +198,6 @@ SELECT
     END AS SM_Flag
 
 FROM userprofiles.brighttvdatasets.user_profile_dataset;
+--------showing our newly created table---------------
+SELECT *
+FROM userprofiles.brighttvdatasets.cleaned_user_profile;
